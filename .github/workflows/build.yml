@@ -5,6 +5,9 @@ on:
     tags:
       - "v*"
 
+permissions:
+  contents: write
+
 jobs:
   build-windows:
     runs-on: windows-latest
@@ -16,7 +19,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: "3.12"
 
       - name: Install dependencies
         run: |
@@ -28,12 +31,12 @@ jobs:
         run: |
           pyinstaller --noconfirm --clean --onedir --windowed --collect-all PySide6 --name ScreenGuard main.py
 
-      - name: Create ZIP
+      - name: Create Windows ZIP
         shell: pwsh
         run: |
           Compress-Archive -Path dist/ScreenGuard -DestinationPath dist/ScreenGuard-Windows.zip
 
-      - name: Upload Windows build
+      - name: Upload Windows artifact
         uses: actions/upload-artifact@v4
         with:
           name: ScreenGuard-Windows
@@ -49,7 +52,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: "3.12"
 
       - name: Install dependencies
         run: |
@@ -61,13 +64,38 @@ jobs:
         run: |
           pyinstaller --noconfirm --clean --onedir --windowed --collect-all PySide6 --name ScreenGuard main.py
 
-      - name: Create ZIP
+      - name: Create macOS ZIP
         run: |
           cd dist
           zip -r ScreenGuard-macOS.zip ScreenGuard
 
-      - name: Upload macOS build
+      - name: Upload macOS artifact
         uses: actions/upload-artifact@v4
         with:
           name: ScreenGuard-macOS
           path: dist/ScreenGuard-macOS.zip
+
+  release:
+    needs:
+      - build-windows
+      - build-macos
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download Windows build
+        uses: actions/download-artifact@v4
+        with:
+          name: ScreenGuard-Windows
+          path: release
+
+      - name: Download macOS build
+        uses: actions/download-artifact@v4
+        with:
+          name: ScreenGuard-macOS
+          path: release
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: release/*.zip
+          generate_release_notes: true
