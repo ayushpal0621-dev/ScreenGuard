@@ -1,0 +1,40 @@
+# Python
+venv/
+build/
+dist/
+__pycache__/
+*.pyc
+.pytest_cache/
+.DS_Store
+ScreenGuard.spec__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Virtual environment
+venv/
+.venv/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ScreenGuard data
+data/face_profiles/
+data/logs/
+*.db
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Config (user-specific)
+config.json
